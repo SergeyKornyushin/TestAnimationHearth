@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:autoTransition="animateToEnd"
+        motion:duration="2000">
+       <KeyFrameSet>
+           <KeyPosition
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="20"
+               motion:keyPositionType="pathRelative"
+               motion:percentX="0.207"
+               motion:percentY="0.055" />
+           <KeyPosition
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="40"
+               motion:keyPositionType="pathRelative"
+               motion:percentX="0.393"
+               motion:percentY="-0.082" />
+           <KeyPosition
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="60"
+               motion:keyPositionType="pathRelative"
+               motion:percentX="0.602"
+               motion:percentY="0.059" />
+           <KeyPosition
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="80"
+               motion:keyPositionType="pathRelative"
+               motion:percentX="0.8"
+               motion:percentY="-0.075" />
+           <KeyPosition
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="99"
+               motion:keyPositionType="pathRelative"
+               motion:percentX="0.99"
+               motion:percentY="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="30"
+               android:alpha="0.9" />
+           <KeyAttribute
+               motion:motionTarget="@+id/emoji_text"
+               motion:framePosition="100"
+               android:alpha="0" />
+       </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/emoji_text" />
+    </ConstraintSet>
+</MotionScene>

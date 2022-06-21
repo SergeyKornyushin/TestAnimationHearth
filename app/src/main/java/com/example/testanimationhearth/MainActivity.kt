@@ -1,18 +1,16 @@
 package com.example.testanimationhearth
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.graphics.Path
-import android.graphics.RectF
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
+import android.util.Log
+import android.view.animation.CycleInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.testanimationhearth.databinding.ActivityMainBinding
-import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -22,70 +20,106 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.heartImage.setOnClickListener {
-            heartOnClick()
+        val containerLayout = binding.container
+        binding.container.setOnClickListener {
+            val cloneView = TextView(this)
+            cloneView.layoutParams = binding.emojiText.layoutParams
+            cloneView.text = binding.emojiText.text
+            containerLayout.addView(cloneView)
         }
-    }
+//
+//        val path1 = Path().apply {
+//            arcTo(-50f, 0f, 50f, 150f, 270f, -180f, false)
+//        }
+        val path1 = Path().apply {
+            arcTo(-50f, 450f, 50f, 600f, 90f, -180f, true)
+        }
+        val path2 = Path().apply {
+            arcTo(-50f, 300f, 50f, 450f, 90f, 180f, true)
+        }
+        val path3 = Path().apply {
+            arcTo(-50f, 150f, 50f, 300f, 90f, -180f, true)
+        }
+        val path4 = Path().apply {
+            arcTo(-50f, 0f, 50f, 150f, 90f, 180f, true)
+        }
 
-    private fun heartOnClick() {
-        // Disable clips on all parent generations
-        disableAllParentsClip(binding.heartImage)
+        val animator = ObjectAnimator.ofFloat(
+            binding.emojiText, "translationX", "translationY", path1
+        ).apply {
+            duration = 500
+        }
+        val animator2 = ObjectAnimator.ofFloat(
+            binding.emojiText, "translationX", "translationY", path2
+        ).apply {
+            duration = 500
+        }
+        val animator3 = ObjectAnimator.ofFloat(
+            binding.emojiText, "translationX", "translationY", path3
+        ).apply {
+            duration = 500
+        }
+        val animator4 = ObjectAnimator.ofFloat(
+            binding.emojiText, "translationX", "translationY", path4
+        ).apply {
+            duration = 500
+        }
+        val valueAnim1 = ValueAnimator.ofFloat(0f, 500f)
+        val bouncer = AnimatorSet().apply {
+            play(animator).before(animator2)
+            play(animator2).before(animator3)
+            play(animator3).before(animator4)
+            play(animator4).after(animator3)
+            interpolator = LinearInterpolator()
+        }
 
-        // Create clone
-        val imageClone = cloneImage()
 
-        // Animate
-        animateFlying(imageClone)
-        animateFading(imageClone)
-    }
+        fun move(view: TextView) {
+            val yAnimator = ValueAnimator.ofFloat(2000f)
+            yAnimator.duration = 2000
+            yAnimator.addUpdateListener { animation ->
+                view.translationY = -(animation.animatedValue as Float) / 2
+            }
+            yAnimator.interpolator = LinearInterpolator()
 
-    private fun cloneImage(): ImageView {
-        val clone = ImageView(this)
-        clone.layoutParams = binding.heartImage.layoutParams
-        clone.setImageDrawable(binding.heartImage.drawable)
-        binding.cloneContainer.addView(clone)
-        return clone
-    }
+            val xAnimator = ValueAnimator.ofFloat(2000f)
+            xAnimator.duration = 2000
+            xAnimator.addUpdateListener { animation ->
+                view.translationX = -(animation.animatedValue as Float) / 20
+            }
+            xAnimator.interpolator = CycleInterpolator(5f)
 
-    private fun animateFlying(image: ImageView) {
-        val x = 0f
-        val y = 0f
-        val r = Random.nextInt(1000, 5000)
-        val angle = 50f
+            val alphaAnimator = ValueAnimator.ofFloat(10f)
+            alphaAnimator.duration = 1000
+            alphaAnimator.addUpdateListener { animation ->
+                view.alpha = 1 / (animation.animatedValue as Float)
+            }
+            alphaAnimator.interpolator = LinearInterpolator()
 
-        val path = Path().apply {
-            when (r % 2) {
-                0 -> arcTo(RectF(x, y - r, x + 2 * r, y + r), 180f, angle)
-                else -> arcTo(RectF(x - 2 * r, y - r, x, y + r), 0f, angle)
+            val scaleAnimator = ValueAnimator.ofFloat(40f)
+            scaleAnimator.duration = 2000
+            scaleAnimator.addUpdateListener { animation ->
+                Log.i("test4", "move: ${(animation.animatedValue as Float)}")
+                view.textSize = (animation.animatedValue as Float)
+            }
+            scaleAnimator.interpolator = LinearInterpolator()
+
+            AnimatorSet().apply {
+                playTogether(yAnimator, xAnimator, scaleAnimator)
+                play(alphaAnimator).after(500)
+                start()
             }
         }
 
-        ObjectAnimator.ofFloat(image, View.X, View.Y, path).apply {
-            duration = 1000
-            start()
-        }
-    }
 
-    private fun animateFading(image: ImageView) {
-        image.animate()
-            .alpha(0f)
-            .setDuration(1000)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.cloneContainer.removeView(image)
-                }
-            })
-    }
 
-    private fun disableAllParentsClip(view: View) {
-        var view = view
-        view.parent?.let {
-            while (view.parent is ViewGroup) {
-                val viewGroup = view.parent as ViewGroup
-                viewGroup.clipChildren = false
-                viewGroup.clipToPadding = false
-                view = viewGroup
-            }
+        binding.emojiText.setOnClickListener {
+            move(binding.emojiText)
+
+//            AnimatorSet().apply {
+//                play(bouncer)
+//                start()
+//            }
         }
     }
 }
