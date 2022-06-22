@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_emoji_size">18dp</dimen>
+    <dimen name="medium_emoji_size">37dp</dimen>
+    <dimen name="small_emoji_size">34dp</dimen>
+    <dimen name="end_emoji_size">31dp</dimen>
+</resources>
